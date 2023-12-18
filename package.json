@@ -1,0 +1,43 @@
+{
+  "name": "myapp",
+  "version": "1.0.0",
+  "description": "This project utilizes Node, Typescript, and graphql",
+  "main": "server.tsx",
+  "scripts": {
+    "start": "npx tsx watch ./server.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "tsc",
+    "test": "mocha --require ts-node/register tests/**/*.ts --reporter=text-summary--recursive --timeout 60000 --no-warnings",
+    "test:coverage": "nyc mocha --require ts-node/register tests/**/*.ts --reporter lcov --reporter=html --timeout 60000 --no-warnings"
+  },
+  "author": "Taiwo Famurewa",
+  "license": "ISC",
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "graphql": "^16.8.1",
+    "graphql-http": "^1.22.0",
+    "graphql-playground-middleware-express": "^1.7.23",
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.11",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.4",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "chai": "^4.3.10",
+    "chai-http": "^4.4.0",
+    "eslint": "^8.56.0",
+    "mocha": "^10.2.0",
+    "mocha-junit-reporter": "^2.2.1",
+    "nodemon": "^3.0.2",
+    "nyc": "^15.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo:7.0.4-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata6:/data/db
+    networks:
+      - node-api
+
+  node_api:
+    build:
+      context: .
+    container_name: node_api
+    environment:
+      - PROJECT_NAME=docker_dev
+      - DB_USER=postgres
+      - DB_PASSWORD=pwd
+      - DB_NAME=portfolio
+      - DB_HOST=portfolio_db
+      - DB_LOG=false
+      - DB_PORT=5432
+      - EMAIL_HOST_PASSWORD=
+    volumes:
+      - .:/src/app
+    ports:
+      - "7777:7777"
+    networks:
+      - node-api  
+  
+
+volumes:
+  dbdata6:
+networks:
+  node-api:
+    driver: bridge
