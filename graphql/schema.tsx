@@ -1,145 +1,119 @@
-// import { buildSchema } from "graphql";
+import { GraphQLSchema, 
+  buildSchema, 
+  GraphQLObjectType, 
+  GraphQLString, 
+  GraphQLID, 
+  GraphQLBoolean, 
+  GraphQLEnumType, 
+  GraphQLInt, 
+  GraphQLList } from 'graphql';
+import { Book, Author } from '../database/models/index';
 
-// export const graphqlSchema = buildSchema(`
-//   type Query {
-//     hello: String
-//   }
-// `);
 
-// // The root provides a resolver function for each API endpoint
-// export const graphqlRoot = {
-//   hello: () => {
-//     return "Hello world!"
-//   },
-// }
-
-import { GraphQLSchema, buildSchema, GraphQLObjectType, GraphQLString, GraphQLID, GraphQLBoolean, GraphQLEnumType, GRAPHQL_MIN_INT, GraphQLInt, GraphQLList } from 'graphql';
-
-buildSchema(`
-  type RootQuery {
-    books: [BookType!]
-
-  },
-  type RootMutation {
-    createBook(title: String): BookType
-  },
-  schema {
-    query: RootQuery,
-    mutation: RootMutation,
+const authorType = new GraphQLObjectType({
+  name: 'Author',
+  fields: {
+    id: { type: GraphQLID },
+    fullname: { type: GraphQLString },
+    email: { type: GraphQLString },
+    mobile: { type: GraphQLString },
+    address: { type: GraphQLString },
+    gender: { type: GraphQLString },
+    // gender: {
+    //   type: new GraphQLEnumType({
+    //     name: 'gender',
+    //     values: { 
+    //       male: {value: 0 },
+    //       female: {value: 1 }
+    //     }
+    //   })
+    // }
   }
-`)
-/**
- * Construct a GraphQL schema and define the necessary resolvers.
- *
- * type Query {
- *   firstName: String
- * }
- */
-// export const graphqlSchema = new GraphQLSchema({
-//   query: new GraphQLObjectType({
-//     name: 'Query',
-//     fields: {
-//       hello: {
-//         type: GraphQLString,
-//         resolve: () => 'world',
-//       },
-//     },
-//   }),
-// });
+});
 
-// const BookSchema = new GraphQLSchema({
-  const BookType =  new GraphQLObjectType({
-    name: 'Book',
+const bookType = new GraphQLObjectType({
+  name: 'Book',
+  fields: {
+    id: { type: GraphQLID },
+    description: { type: GraphQLID },
+    title: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
+    isActive: { type: GraphQLBoolean },
+    authorId: { type: GraphQLInt },
+  }
+});
+
+export const graphqlSchema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: 'RootQueryType',
     fields: {
-      id: { type: GraphQLID },
-      title: { type: GraphQLString },
-      authorId: { type: GraphQLID },
-      description: { type: GraphQLString },
-      isAvailable: { type: GraphQLBoolean },
-      bookColor: {
-        type: GraphQLEnumType,
-        values: {
-          RED: { value: 0},
-          GREEN: { value: 1},
-          BLUE: { value: 2},
-          YELLO: { value: 3},
+      hello: {
+        type: GraphQLString,
+        resolve: () => 'hello world'
+      },
+      author: {
+        type: authorType,
+        args: {
+          id: {
+              type: GraphQLID
+          }
+        },
+        resolve: async (parent, {id}) => {
+          const author = await Author.findOne({_id: id}).populate('books').exec();
+          return author;
         }
       },
-      reference: { type: GraphQLInt },
-    }
-  });
-
-// const AuthorSchema = new GraphQLSchema({
-  const AuthorType = new GraphQLObjectType({
-    name: 'Query',
-    fields: {
-      id: { type: GraphQLID },
-      firstName: { type: GraphQLString },
-      lastName: { type: GraphQLString },
-      email: { type: GraphQLString }
-    }
-  });
-// });
-
-export const graphqlSchema = new GraphQLObjectType({
-  name: 'RootQueryType',
-  fields: {
+      authors: {
+        type: new GraphQLList(authorType),
+        resolve: async () => {
+          const authors = await Author.find({}).populate('books').exec();
+          return authors;
+        },
+      },
       book: {
-          type: BookType,
-          args: {
-              id: {
-                  type: GraphQLID
-              }
-          },
-          resolve(parent, args){
-            return {}
-              // return User.findById(args.id);
+        type: bookType,
+        args: {
+          id: {
+              type: GraphQLID
           }
+        },
+        resolve: async (parent, {id}) => {
+          const book = await Book.findOne({_id: id}).exec();
+          if(book) {
+            book.id = book._id
+          }
+          return book;
+        }
       },
       books: {
-          type: new GraphQLList(BookType),
-          resolve(parent, args){
-            return []
-              // return User.find({})
-          }
-      },
-
-      author: {
-        type: AuthorType,
-        args: {
-            id: {
-                type: GraphQLID
-            }
+        type: new GraphQLList(bookType),
+        resolve: async () => {
+          const books = await Book.find({}).populate('author').exec();
+          return books;
         },
-        resolve(parent, args){
-          return {}
-            // return User.findById(args.id);
-        }
+      },
     },
-  }
-})
-
-// console.log('ccccc', graphqlSchema)
-
-
-
-// Resolvers define how to fetch the types defined in your schema.
-// This resolver retrieves books from the "books" array above.
-// const resolvers = {
-//   Query: {
-//     books: () => books,
-//   },
-// };
-
-// type Book {
-//   title: String
-//   author: String
-// }
-
-// # The "Query" type is special: it lists all of the available queries that
-// # clients can execute, along with the return type for each. In this
-// # case, the "books" query returns an array of zero or more Books (defined above).
-// type Query {
-//   books: [Book]
-// }
-// `;
+  }),
+  mutation: new GraphQLObjectType({
+    name: 'RootMutation',
+    fields: {
+      addAuthor: {
+        type: authorType,
+        args: {
+          fullname: { type: GraphQLString },
+          email: { type: GraphQLString },
+          mobile: { type: GraphQLString },
+          address: { type: GraphQLString },
+          gender: { type: GraphQLString }
+        },
+        resolve: async (parent, args) => {
+          const author = await Author.create({...args})
+          if(author) {
+            author.id = author._id;
+          }
+          return author;
+        }
+      }
+    } 
+  })
+});

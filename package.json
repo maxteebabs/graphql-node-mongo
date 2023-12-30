@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/cors": "^2.8.17",
+    "@types/graphql": "^14.5.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -22,11 +23,13 @@
     "graphql": "^16.8.1",
     "graphql-http": "^1.22.0",
     "graphql-playground-middleware-express": "^1.7.23",
-    "mongodb": "^6.3.0"
+    "mongoose": "^8.0.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "@types/chai": "^4.3.11",
     "@types/express": "^4.17.21",
+    "@types/faker": "^6.6.9",
     "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
